@@ -90,10 +90,10 @@ class RealPlayer(Player):
             numList.append("K")
         if "A" in caseList:
             numList.append("A")
-        print(numList)
         return numList
 
     def makeBid(self, game, bid): # bid is from user input
+    
         game.bidSequence.append(bid)
         self.bids.append(bid)
     
@@ -192,7 +192,14 @@ class Button(object):
                 eventX, eventY = event.pos
                 if (eventX > self.x0 and eventX < self.x
                     and eventY < self.y and eventY > self.y0):
-                        return ((self.y0-200)//50 + 1, self.x0//80 )
+                        if self.y < 41:
+                            return (((self.y0-200)//50 + 1, self.x0//80 ))
+                        elif self.x0//100 == 2: 
+                            return (0,0) # pass
+                        elif self.x0//100 == 0: 
+                            return (0,1) # double
+                        elif self.x0//100 == 1:
+                            return (0,2) # redouble
 
 #edited from http://blog.lukasperaza.com/getting-started-with-pygame/
 class PygameGame(object):
@@ -312,7 +319,9 @@ class PygameGame(object):
 
                 for row in range(len(self.buttons)):
                     for col in range(len(self.buttons[0])):
-                        self.player.makeBid(self, self.buttons[row][col].event_handler(event))
+                        response = self.buttons[row][col].event_handler(event)
+                        if response != None:
+                            self.player.makeBid(self,response)
 
                 for bb in range(len(self.biddingBarButtons)):
                     self.biddingBarButtons[bb].event_handler(event)
