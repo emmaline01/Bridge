@@ -57,9 +57,11 @@ class Player(object):
 class RealPlayer(Player):
 
     def __init__(self, game, seat):
-        super().__init__(self,game,seat)
+        super().__init__(game,seat)
+        print(self.hand)
         # sorted hand is a dict with suit as key
         self.hand = self.sortHand()
+        #print(self.hand)
 
     def sortHand(self):
         sortedHand = {'S':[],'H':[],'D':[],'C':[]}
@@ -67,17 +69,19 @@ class RealPlayer(Player):
         for card in self.hand:
             sortedHand[card.suit].append(card)
         for suit in sortedHand:
-            sortedHand[suit] = mySort(sortedHand[suit])    
+            sortedHand[suit] = self.mySort(sortedHand[suit])    
     
-    def mySort(L):
+    def mySort(self, L):
         numList = []
         caseList = []
         for i in range(len(L)):
-            if L[i].isdigit():
-                numList.append(L[i])
-            elif L[i].isalpha():
-                caseList.append(L[i])
+            if L[i].rank.isdigit():
+                numList.append(L[i].rank)
+            elif L[i].rank.isalpha():
+                caseList.append(L[i].rank)
         numList.sort()
+        if numList != [] and numList[0] == '10':
+            numList += numList.pop(0)
         if "J" in caseList:
             numList.append("J")
         if "Q" in caseList:
@@ -86,6 +90,7 @@ class RealPlayer(Player):
             numList.append("J")
         if "A" in caseList:
             numList.append("J")
+        print(numList)
         return numList
 
     def makeBid(self, game, bid): # bid is from user input
@@ -187,7 +192,7 @@ class Button(object):
                 eventX, eventY = event.pos
                 if (eventX > self.x0 and eventX < self.x 
                     and eventY < self.y and eventY > self.y0):
-                    print(f"{(self.y0-200)//50 + 1},{self.x0//80}")
+                    return ((self.y0-200)//50 + 1, self.x0//80 )
 
 #edited from http://blog.lukasperaza.com/getting-started-with-pygame/
 class PygameGame(object):
@@ -205,8 +210,8 @@ class PygameGame(object):
         # self.net = Network()
 
         self.deck = Deck()
-        self.player = Player(self, 'S')
-        self.player2 = Player(self, 'N')
+        self.player = RealPlayer(self, 'S')
+        self.player2 = RealPlayer(self, 'N')
         self.allPlayers = []
         for AISeat in ['E','W']:
             self.allPlayers.append(Player(self,AISeat))
@@ -297,7 +302,7 @@ class PygameGame(object):
 
                 for row in range(len(self.buttons)):
                     for col in range(len(self.buttons[0])):
-                        self.buttons[row][col].event_handler(event)
+                        self.player.makeBid(self, self.buttons[row][col].event_handler(event))
 
             screen.fill((70, 130, 50))
             self.biddingOptScreen.fill((50, 110, 30))
