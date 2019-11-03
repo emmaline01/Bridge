@@ -33,7 +33,7 @@ class Deck(object):
                 random.shuffle(self.deck)
 
 class Player(object):
-    bids = {(0,0): 'Pass',(0,1):'Double',(0,2):'Redouble',(1,0): '1NT',(1,1): '1S',(1,2):'1H',(1,3):'1D',(1,4):'1C'}
+    bids = {(0,0):'Pass',(0,1):'Double',(0,2):'Redouble',(1,0): '1NT',(1,1): '1S',(1,2):'1H',(1,3):'1D',(1,4):'1C'}
 
     def __init__(self, game, seat): 
         # game is the app object
@@ -198,11 +198,11 @@ class Button(object):
                         if self.y < 410:
                             return (((self.y0-200)//50 + 1, self.x0//80 ))
                         elif self.x0//100 == 2: 
-                            return (0,0) # pass
+                            return ((0,0)) # pass
                         elif self.x0//100 == 0: 
-                            return (0,1) # double
+                            return ((0,1)) # double
                         elif self.x0//100 == 1:
-                            return (0,2) # redouble
+                            return ((0,2)) # redouble
 
 #edited from http://blog.lukasperaza.com/getting-started-with-pygame/
 class PygameGame(object):
