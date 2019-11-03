@@ -207,7 +207,6 @@ class PygameGame(object):
         self.fps = fps
         self.title = title
 
-<<<<<<< HEAD
         #self.net = Network()
 
         self.deck = Deck()
@@ -322,7 +321,7 @@ class PygameGame(object):
             screen.fill((70, 130, 50))
             self.biddingOptScreen.fill((50, 110, 30))
             self.biddingBarScreen.fill((0, 0, 0))
-            self.handScreen.fill((255, 255, 255))
+            self.handScreen.fill((70, 130, 50))
 
             #draw buttons
             for row in range(len(self.buttons)):
@@ -331,6 +330,10 @@ class PygameGame(object):
             for bb in range(len(self.biddingBarButtons)):
                 self.biddingBarButtons[bb].draw(self.biddingBarScreen)
             
+            #draw compass
+            self.compass = pygame.transform.scale(pygame.image.load(f'imgs/compass.png').convert_alpha(), (120, 150))
+            screen.blit(self.compass, (10, 10))
+
             #put all the other surfaces on the back screen
             screen.blit(self.biddingOptScreen, (0, self.tableScreenHeight))
             screen.blit(self.biddingBarScreen, 
