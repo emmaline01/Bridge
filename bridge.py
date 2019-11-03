@@ -169,7 +169,7 @@ class Button(object):
                 eventX, eventY = event.pos
                 if (eventX > self.x0 and eventX < self.x 
                     and eventY < self.y and eventY > self.y0):
-                    print("clicked!")
+                    print(f"{(self.y0-200)//50 + 1},{self.x0//80}")
 
 #edited from http://blog.lukasperaza.com/getting-started-with-pygame/
 class PygameGame(object):
@@ -184,7 +184,7 @@ class PygameGame(object):
         self.fps = fps
         self.title = title
 
-        self.net = Network()
+        # self.net = Network()
 
         self.deck = Deck()
         self.player = Player(self, 'S')
@@ -199,8 +199,8 @@ class PygameGame(object):
         self.bidSequence = []
 
         #does this work
-        print(f'sending,{self.parse_data(self.send_data())}')
-        self.player2.bids.append(self.parse_data(self.send_data()))
+        #print(f'sending,{self.parse_data(self.send_data())}')
+        #self.player2.bids.append(self.parse_data(self.send_data()))
 
         self.tableScreenHeight = 200
         self.biddingOptScreenHeight = 200
@@ -224,13 +224,13 @@ class PygameGame(object):
         reply = self.net.send(data)
         return reply
 
-    @staticmethod
+    '''@staticmethod
     def parse_data(data):
         try:
             d = data.split(":")[1].split(",")
             return int(d[0]), int(d[1])
         except:
-            return 0,0
+            return 0,0'''
 
     def initButtons(self):
 
@@ -300,6 +300,7 @@ class PygameGame(object):
             pygame.display.flip()
 
         pygame.quit()
+
 
 game = PygameGame()
 game.run()
