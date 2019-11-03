@@ -66,9 +66,27 @@ class RealPlayer(Player):
         # sort according to suits
         for card in self.hand:
             sortedHand[card.suit].append(card)
-
-        # have not sorted each suit
-        
+        for suit in sortedHand:
+            sortedHand[suit] = mySort(sortedHand[suit])    
+    
+    def mySort(L):
+        numList = []
+        caseList = []
+        for i in range(len(L)):
+            if L[i].isdigit():
+                numList.append(L[i])
+            elif L[i].isalpha():
+                caseList.append(L[i])
+        numList.sort()
+        if "J" in caseList:
+            numList.append("J")
+        if "Q" in caseList:
+            numList.append("J")
+        if "K" in caseList:
+            numList.append("J")
+        if "A" in caseList:
+            numList.append("J")
+        return numList
 
     def makeBid(self, game, bid): # bid is from user input
         game.bidSequence.append(bid)
