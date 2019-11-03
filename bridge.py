@@ -183,6 +183,8 @@ class PygameGame(object):
         self.fps = fps
         self.title = title
 
+        self.net = Network()
+
         self.deck = Deck()
         self.player = Player(self, 'S')
         self.allPlayers = []
