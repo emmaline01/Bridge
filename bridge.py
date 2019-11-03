@@ -94,6 +94,7 @@ class RealPlayer(Player):
         return numList
 
     def makeBid(self, game, bid): # bid is from user input
+        print(self.seat, bid)
         game.bidSequence.append(bid)
         self.bids.append(bid)
     
