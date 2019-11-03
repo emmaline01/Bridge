@@ -186,11 +186,13 @@ class PygameGame(object):
         self.net = Network()
 
         self.deck = Deck()
-        self.player = Player(self, 'S')
+        self.player1 = Player(self, 'S')
+        self.player2 = Player(self, 'N')
         self.allPlayers = []
-        for AISeat in ['N','E','W']:
+        for AISeat in ['E','W']:
             self.allPlayers.append(Player(self,AISeat))
-        self.allPlayers.insert(2,self.player)
+        self.allPlayers.insert(0,self.player2)
+        self.allPlayers.insert(2,self.player1)
         for player in self.allPlayers:
             player.setPartner(self)
         self.bidSequence = []
@@ -207,6 +209,23 @@ class PygameGame(object):
         self.initButtons()
 
         pygame.init()
+
+    def send_data(self):
+        """
+        Send position to server
+        :return: None
+        """
+        data = str(self.net.id) + ":" + str(self.bid) # shouldnt be the case
+        reply = self.net.send(data)
+        return reply
+
+    @staticmethod
+    def parse_data(data):
+        try:
+            d = data.split(":")[1].split(",")
+            return int(d[0]), int(d[1])
+        except:
+            return 0,0
 
     def initButtons(self):
 
