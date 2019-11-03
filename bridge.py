@@ -25,6 +25,7 @@ class Hand(object):
             self.hand += [newCard]
             deckObj.deck.remove(newCard)
 
+#edited from http://blog.lukasperaza.com/getting-started-with-pygame/
 class PygameGame(object):
 
     """
