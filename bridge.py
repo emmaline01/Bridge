@@ -45,7 +45,14 @@ class PygameGame(object):
         self.deck = Deck()
         self.playerHand = Hand(self.deck)
 
-        self.biddingOptScreen = pygame.Surface((self.width, self.height/2))
+        self.tableScreenHeight = 200
+        self.biddingOptScreenHeight = 200
+        self.biddingOptScreen = pygame.Surface((self.width, 
+            self.biddingOptScreenHeight))
+        self.biddingBarScreenHeight = 80
+        self.biddingBarScreen = pygame.Surface((self.width, 80))
+        self.handScreen = pygame.Surface(
+            (self.width, self.height - self.tableScreenHeight - self.biddingBarScreenHeight - self.biddingOptScreenHeight))
 
         pygame.init()
 
@@ -75,7 +82,13 @@ class PygameGame(object):
 
             screen.fill((70, 130, 50))
             self.biddingOptScreen.fill((50, 110, 30))
-            screen.blit(self.biddingOptScreen, (0, self.height/4))
+            self.biddingBarScreen.fill((0, 0, 0))
+            self.handScreen.fill((255, 255, 255))
+            screen.blit(self.biddingOptScreen, (0, self.tableScreenHeight))
+            screen.blit(self.biddingBarScreen, 
+                (0, self.tableScreenHeight + self.biddingOptScreenHeight))
+            screen.blit(self.handScreen, 
+                (0, self.tableScreenHeight + self.biddingOptScreenHeight + self.biddingBarScreenHeight))
 
             self.redrawAll(screen)
             pygame.display.flip()
