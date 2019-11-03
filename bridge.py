@@ -113,7 +113,7 @@ class AI(Player):
                     bid = (3, 4) # club has to start from 3C
         return bid
 
-    def respondTo1NT(self):
+    def respondTo1NT(self): 
         pass
 
 
