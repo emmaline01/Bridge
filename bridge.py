@@ -1,6 +1,7 @@
 import pygame
 import random
 import socket
+from network import Network
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -186,16 +187,20 @@ class PygameGame(object):
         self.net = Network()
 
         self.deck = Deck()
-        self.player1 = Player(self, 'S')
+        self.player = Player(self, 'S')
         self.player2 = Player(self, 'N')
         self.allPlayers = []
         for AISeat in ['E','W']:
             self.allPlayers.append(Player(self,AISeat))
         self.allPlayers.insert(0,self.player2)
-        self.allPlayers.insert(2,self.player1)
+        self.allPlayers.insert(2,self.player)
         for player in self.allPlayers:
             player.setPartner(self)
         self.bidSequence = []
+
+        #does this work
+        print(f'sending,{self.parse_data(self.send_data())}')
+        self.player2.bids.append(self.parse_data(self.send_data()))
 
         self.tableScreenHeight = 200
         self.biddingOptScreenHeight = 200
