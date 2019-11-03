@@ -2,10 +2,11 @@ import socket
 from _thread import *
 import sys
 import run
+
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 server = 'localhost'
-port = 5555
+port = 5556
 
 server_ip = socket.gethostbyname(server)
 
