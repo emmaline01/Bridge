@@ -1,5 +1,9 @@
 import pygame
 import random
+import socket
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
 
 class Card(object):
     def __init__(self, suit, rank):
