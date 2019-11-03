@@ -33,6 +33,8 @@ class Deck(object):
                 random.shuffle(self.deck)
 
 class Player(object):
+    bids = {(0,0): 'Pass',(0,1):'Double',(0,2):'Redouble',(1,0): '1NT',(1,1): '1S',(1,2):'1H',(1,3):'1D',(1,4):'1C'}
+
     def __init__(self, game, seat): 
         # game is the app object
         # seat is supposed to be N,S,E,W in str
@@ -49,10 +51,15 @@ class Player(object):
         return hash(hashable)
 
     def __eq__(self, other):
-        return isinstance(self,player) and self.seat == other.seat
+        return isinstance(self,Player) and self.seat == other.seat
     
     def setPartner(self, game):
         self.partner = game.allPlayers[(self.playerNum + 2) % 4]
+
+    def recordBid(self, game, bid):
+        self.bids.append(bid)
+        game.bidSequence.append(bid)
+        print(Player.bids[bid])
         
 class RealPlayer(Player):
 
@@ -89,13 +96,12 @@ class RealPlayer(Player):
         return numList
 
     def makeBid(self, game, bid): # bid is from user input
-        game.bidSequence.append(bid)
-        self.bids.append(bid)
+        super().recordBid(game,bid)
     
 
 class AI(Player):
     def __init__(self,game,seat):
-        super().__init__(self,game,seat)
+        super().__init__(game,seat)
         self.hcp = 0
         for card in self.hand:
             if card.rank == 'A': self.hcp += 4
@@ -116,10 +122,6 @@ class AI(Player):
                 return False
         return True
 
-    def recordBid(self,game, bid):
-        self.bids.append(bid)
-        game.bidSequence.append(bid)
-
     def makeBid(self, game): # turn should be some count % 4
         # mute opponent first
         if self.partner != game.player: 
@@ -136,8 +138,10 @@ class AI(Player):
         
         elif partner.bids[0] == (1, 0):
             bid = self.respondTo1NT()
-        
-        self.recordBid(game,bid)
+        else:
+            bid = (0,0)
+        super().recordBid(game,bid)
+
 
     def makeOpeningBid(self):
         if self.hcp > 21:
@@ -185,9 +189,16 @@ class Button(object):
         if event.type == pygame.MOUSEBUTTONDOWN: # is some button clicked
             if event.button == 1: # is left button clicked
                 eventX, eventY = event.pos
-                if (eventX > self.x0 and eventX < self.x 
+                if (eventX > self.x0 and eventX < self.x
                     and eventY < self.y and eventY > self.y0):
-                    print("clicked!")
+                        if self.y < 410:
+                            return (((self.y0-200)//50 + 1, self.x0//80 ))
+                        elif self.x0//100 == 2: 
+                            return (0,0) # pass
+                        elif self.x0//100 == 0: 
+                            return (0,1) # double
+                        elif self.x0//100 == 1:
+                            return (0,2) # redouble
 
 #edited from http://blog.lukasperaza.com/getting-started-with-pygame/
 class PygameGame(object):
@@ -202,24 +213,18 @@ class PygameGame(object):
         self.fps = fps
         self.title = title
 
-        self.net = Network()
+        #self.net = Network()
 
         self.deck = Deck()
-        self.player = Player(self, 'S')
-        self.player2 = Player(self, 'N')
+        self.player = RealPlayer(self, 'S')
         self.allPlayers = []
-        for AISeat in ['E','W']:
-            self.allPlayers.append(Player(self,AISeat))
-        self.allPlayers.insert(0,self.player2)
+        for AISeat in ['N','E','W']:
+            self.allPlayers.append(AI(self,AISeat))
         self.allPlayers.insert(2,self.player)
         for player in self.allPlayers:
             player.setPartner(self)
         self.bidSequence = []
-        self.Disabled = [[0]*5 for _ in range(7)]
-        for i in range(7):
-            for j in range(5):
-                self.Disabled[i][j] = False
-        # i corresponds to i+1 in the real tuple representing the biddings
+        self.turn = 0
 
 
 
@@ -240,15 +245,14 @@ class PygameGame(object):
         pygame.init()
 
 
-
-    def send_data(self):
+#    def send_data(self):
         """
         Send position to server
         :return: None
         """
-        data = str(self.net.id) + ":" + str(self.bid) # shouldnt be the case
-        reply = self.net.send(data)
-        return reply
+    #    data = str(self.net.id) + ":" + str(self.bid) # shouldnt be the case
+    #    reply = self.net.send(data)
+    #    return reply
 
     @staticmethod
     def parse_data(data):
@@ -260,6 +264,7 @@ class PygameGame(object):
 
     def initButtons(self):
 
+        #biddingOptScreen buttons
         buttonNames = [0, 141, 282, 423, 564]
         self.buttons = []
         newRow = []
@@ -278,6 +283,15 @@ class PygameGame(object):
                 newButton = Button(self.tableScreenHeight, newPos, pygame.transform.scale(newImg, (60, 40)))
                 newRow.append(newButton)  
             self.buttons.append(newRow)
+
+
+        self.biddingBarButtons = []
+        #biddingBarScreen buttons
+        for bb in range(1, 5):
+            newPos = (((bb-1)*100 + 10, 10), (bb*100 + 10, 50*row))
+            newImg = pygame.image.load(f'imgs/bar{bb}.jpg')
+            newButton = Button(self.tableScreenHeight + self.biddingOptScreenHeight, newPos, pygame.transform.scale(newImg, (80, 60)))
+            self.biddingBarButtons.append(newButton)
 
     def timerFired(self, dt):
         pass
@@ -298,6 +312,14 @@ class PygameGame(object):
         while playing:
             time = clock.tick(self.fps)
             self.timerFired(time)
+            
+            # take turns bid
+            '''
+            while True:
+                turn = self.turn % 4
+                if turn != 2:
+                    self.allPlayers[turn].makeBid(self)'''
+            
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -305,17 +327,31 @@ class PygameGame(object):
 
                 for row in range(len(self.buttons)):
                     for col in range(len(self.buttons[0])):
-                        self.buttons[row][col].event_handler(event)
+                        response = self.buttons[row][col].event_handler(event)
+                        if response != None:
+                            self.player.makeBid(self,response)
 
+                for bb in range(len(self.biddingBarButtons)):
+                    self.biddingBarButtons[bb].event_handler(event)
+
+            #fill background colors of surfaces
             screen.fill((70, 130, 50))
             self.biddingOptScreen.fill((50, 110, 30))
             self.biddingBarScreen.fill((0, 0, 0))
-            self.handScreen.fill((255, 255, 255))
+            self.handScreen.fill((70, 130, 50))
 
+            #draw buttons
             for row in range(len(self.buttons)):
                 for col in range(len(self.buttons[0])):
                     self.buttons[row][col].draw(self.biddingOptScreen)
+            for bb in range(len(self.biddingBarButtons)):
+                self.biddingBarButtons[bb].draw(self.biddingBarScreen)
             
+            #draw compass
+            self.compass = pygame.transform.scale(pygame.image.load(f'imgs/compass.png').convert_alpha(), (120, 150))
+            screen.blit(self.compass, (10, 10))
+
+            #put all the other surfaces on the back screen
             screen.blit(self.biddingOptScreen, (0, self.tableScreenHeight))
             screen.blit(self.biddingBarScreen, 
                 (0, self.tableScreenHeight + self.biddingOptScreenHeight))
