@@ -22,7 +22,7 @@ class Card(object):
 class Deck(object):
     def __init__(self):
         suits = ['C', 'D', 'H', 'S']
-        ranks = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 
+        ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 
             'Q', 'K', 'A']
 
         self.deck = []
