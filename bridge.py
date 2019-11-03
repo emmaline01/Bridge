@@ -25,8 +25,9 @@ class Player(object):
         allSeats = {'N': ['North', 1], 'E':['East', 2], 'S':['South',3],'W':['West',4]}
         self.seatName = allSeats[seat][0]
         self.playerNum = allSeats[seat][1]
-        self.hand = None #game.deck[13 * (self.playerNum-1), 13 * self.playerNum]
-        self.partner = None #game.allPlayers[(self.playerNum + 2) % 4]
+
+        self.hand = game.deck.deck[13 * (self.playerNum-1): 13 * self.playerNum]
+        self.bids = []
 
     def __hash__(self):
         hashable = (self.seat)
@@ -34,11 +35,13 @@ class Player(object):
 
     def __eq__(self, other):
         return isinstance(self,player) and self.seat == other.seat
+    
+    def setPartner(self, game):
+        self.partner = game.allPlayers[(self.playerNum + 2) % 4]
         
 class RealPlayer(Player):
     def makeBid(self, game, bid): # bid is from user input
         game.bidSequence.append(bid)
-
 
 class AI(Player):
     def __init__(self,game,seat):
@@ -57,15 +60,63 @@ class AI(Player):
             self.distribution[card.suit] += 1
             return self.distribution
 
+    def isBalancedHand(self):
+        for suit in self.distribution:
+            if self.distribution[suit] < 2 or self.distribution[suit] > 5:
+                return False
+        return True
 
-    def makeBid(self, game, turn): # turn should be some count % 4
+    def recordBid(self,game, bid):
+        self.bids.append(bid)
+        game.bidSequence.append(bid)
+
+    def makeBid(self, game): # turn should be some count % 4
         # mute opponent first
-        if self.partner != game.player: return 'Pass'
+        if self.partner != game.player: 
+            bid = (0, 0)
 
-        if self.hcp < 6:
-            return 'Pass'
+        # actually dumb bidding
+        # (2,4) is the strong 2C opening
+        if not self.partner.bids[0] == (2,4) and self.hcp < 6: # pass if you have nothing
+            bid =  (0, 0)
+
+        # opening bid
         elif len(game.bidSequence) < 1:
-            pass
+            bid = self.makeOpeningBid()
+        
+        elif partner.bids[0] == (1, 0):
+            bid = self.respondTo1NT()
+        
+        self.recordBid(game,bid)
+
+    def makeOpeningBid(self):
+        if self.hcp > 21:
+            bid = (2, 4) # 2C opening
+        elif 12 <= self.hcp <= 21 or (self.hcp == 11 and not self.isBalancedHand()):
+            if 15 <= self.hcp <= 17 and self.isBalancedHand():
+                bid = (1, 0)
+            elif 20 <= self.hcp <= 21 and self.isBalancedHand():
+                bid = (2, 0)
+            elif self.distribution['S'] >= 5:
+                bid = (1, 1)
+            elif self.distribution['H'] >= 5:
+                bid = (1, 2)
+            elif self.distribution['D'] >= 4:
+                bid = (1, 3)
+            else: bid = (1, 4)
+        # pre - empts
+        elif 6 <= self.hcp <= 10:
+            bidOptions = ['S','H','D','C']
+            for i in range(len(bidOptions)-1):
+                if self.distribution[bidOptions[i]] >= 6:
+                    bid = (2, i + 1)
+                elif self.distribution[bidOptions[-1]] >= 7:
+                    bid = (3, 4) # club has to start from 3C
+        return bid
+
+    def respondTo1NT(self): 
+        pass
+
 
 class Button(object):
     def __init__ (self, tableScreenHeight, position, image):
@@ -107,6 +158,8 @@ class PygameGame(object):
         for AISeat in ['N','E','W']:
             self.allPlayers.append(Player(self,AISeat))
         self.allPlayers.insert(2,self.player)
+        for player in self.allPlayers:
+            player.setPartner(self)
         self.bidSequence = []
 
         self.tableScreenHeight = 200
