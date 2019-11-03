@@ -81,15 +81,15 @@ class RealPlayer(Player):
                 caseList.append(L[i].rank)
         numList.sort()
         if numList != [] and numList[0] == '10':
-            numList += numList.pop(0)
+            numList += [numList.pop(0)]
         if "J" in caseList:
             numList.append("J")
         if "Q" in caseList:
-            numList.append("J")
+            numList.append("Q")
         if "K" in caseList:
-            numList.append("J")
+            numList.append("K")
         if "A" in caseList:
-            numList.append("J")
+            numList.append("A")
         print(numList)
         return numList
 
