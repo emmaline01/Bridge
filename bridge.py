@@ -67,6 +67,7 @@ class AI(Player):
         elif len(game.bidSequence) < 1:
             pass
 
+#edited from http://blog.lukasperaza.com/getting-started-with-pygame/
 class PygameGame(object):
 
     """
@@ -77,7 +78,7 @@ class PygameGame(object):
         ''' return whether a specific key is being held '''
         return self._keys.get(key, False)
 
-    def __init__(self, width=600, height=400, fps=50, title="112 Pygame Game"):
+    def __init__(self, width=400, height=600, fps=50, title="Bridge"):
         self.width = width
         self.height = height
         self.fps = fps
@@ -90,6 +91,15 @@ class PygameGame(object):
             self.allPlayers.append(Player(self,AISeat))
         self.allPlayers.insert(2,self.player)
         self.bidSequence = []
+
+        self.tableScreenHeight = 200
+        self.biddingOptScreenHeight = 200
+        self.biddingOptScreen = pygame.Surface((self.width, 
+            self.biddingOptScreenHeight))
+        self.biddingBarScreenHeight = 80
+        self.biddingBarScreen = pygame.Surface((self.width, 80))
+        self.handScreen = pygame.Surface(
+            (self.width, self.height - self.tableScreenHeight - self.biddingBarScreenHeight - self.biddingOptScreenHeight))
 
         pygame.init()
 
@@ -117,7 +127,16 @@ class PygameGame(object):
                 if event.type == pygame.QUIT:
                     playing = False
 
-            screen.fill((255, 255, 255))
+            screen.fill((70, 130, 50))
+            self.biddingOptScreen.fill((50, 110, 30))
+            self.biddingBarScreen.fill((0, 0, 0))
+            self.handScreen.fill((255, 255, 255))
+            screen.blit(self.biddingOptScreen, (0, self.tableScreenHeight))
+            screen.blit(self.biddingBarScreen, 
+                (0, self.tableScreenHeight + self.biddingOptScreenHeight))
+            screen.blit(self.handScreen, 
+                (0, self.tableScreenHeight + self.biddingOptScreenHeight + self.biddingBarScreenHeight))
+
             self.redrawAll(screen)
             pygame.display.flip()
 
