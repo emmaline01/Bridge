@@ -10,6 +10,15 @@ class Card(object):
         self.rank = rank
         self.suit = suit
 
+    def __repr__(self):
+        return f'{self.suit},{self.rank}'
+
+    def __hash__(self):
+        return hash((self.suit,self.rank))
+
+    def __eq__(self, other):
+        return self.rank == other.rank and self.suit == other.suit
+
 class Deck(object):
     def __init__(self):
         suits = ['C', 'D', 'H', 'S']
@@ -20,6 +29,7 @@ class Deck(object):
         for suit in suits:
             for rank in ranks:
                 self.deck += [Card(suit, rank)]
+                random.shuffle(self.deck)
 
 class Player(object):
     def __init__(self, game, seat): 
@@ -44,8 +54,25 @@ class Player(object):
         self.partner = game.allPlayers[(self.playerNum + 2) % 4]
         
 class RealPlayer(Player):
+
+    def __init__(self, game, seat):
+        super().__init__(self,game,seat)
+        # sorted hand is a dict with suit as key
+        self.hand = self.sortHand()
+
+    def sortHand(self):
+        sortedHand = {'S':[],'H':[],'D':[],'C':[]}
+        # sort according to suits
+        for card in self.hand:
+            sortedHand[card.suit].append(card)
+
+        # have not sorted each suit
+        
+
     def makeBid(self, game, bid): # bid is from user input
         game.bidSequence.append(bid)
+        self.bids.append(bid)
+    
 
 class AI(Player):
     def __init__(self,game,seat):
