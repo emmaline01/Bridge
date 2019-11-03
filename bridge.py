@@ -191,9 +191,9 @@ class Button(object):
         if event.type == pygame.MOUSEBUTTONDOWN: # is some button clicked
             if event.button == 1: # is left button clicked
                 eventX, eventY = event.pos
-                if (eventX > self.x0 and eventX < self.x 
+                if (eventX > self.x0 and eventX < self.x
                     and eventY < self.y and eventY > self.y0):
-                    return ((self.y0-200)//50 + 1, self.x0//80 )
+                        return ((self.y0-200)//50 + 1, self.x0//80 )
 
 #edited from http://blog.lukasperaza.com/getting-started-with-pygame/
 class PygameGame(object):
@@ -208,7 +208,8 @@ class PygameGame(object):
         self.fps = fps
         self.title = title
 
-        # self.net = Network()
+<<<<<<< HEAD
+        #self.net = Network()
 
         self.deck = Deck()
         self.player = RealPlayer(self, 'S')
@@ -239,14 +240,14 @@ class PygameGame(object):
 
         pygame.init()
 
-    def send_data(self):
+    #def send_data(self):
         """
         Send position to server
         :return: None
         """
-        data = str(self.net.id) + ":" + str(self.bid) # shouldnt be the case
-        reply = self.net.send(data)
-        return reply
+    #    data = str(self.net.id) + ":" + str(self.bid) # shouldnt be the case
+    #    reply = self.net.send(data)
+    #    return reply
 
     '''@staticmethod
     def parse_data(data):
@@ -258,6 +259,7 @@ class PygameGame(object):
 
     def initButtons(self):
 
+        #biddingOptScreen buttons
         buttonNames = [0, 141, 282, 423, 564]
         self.buttons = []
         newRow = []
@@ -276,6 +278,15 @@ class PygameGame(object):
                 newButton = Button(self.tableScreenHeight, newPos, pygame.transform.scale(newImg, (60, 40)))
                 newRow.append(newButton)  
             self.buttons.append(newRow)
+
+
+        self.biddingBarButtons = []
+        #biddingBarScreen buttons
+        for bb in range(1, 5):
+            newPos = (((bb-1)*100 + 10, 10), (bb*100 + 10, 50*row))
+            newImg = pygame.image.load(f'imgs/bar{bb}.jpg')
+            newButton = Button(self.tableScreenHeight + self.biddingOptScreenHeight, newPos, pygame.transform.scale(newImg, (80, 60)))
+            self.biddingBarButtons.append(newButton)
 
     def timerFired(self, dt):
         pass
@@ -305,15 +316,23 @@ class PygameGame(object):
                     for col in range(len(self.buttons[0])):
                         self.player.makeBid(self, self.buttons[row][col].event_handler(event))
 
+                for bb in range(len(self.biddingBarButtons)):
+                    self.biddingBarButtons[bb].event_handler(event)
+
+            #fill background colors of surfaces
             screen.fill((70, 130, 50))
             self.biddingOptScreen.fill((50, 110, 30))
             self.biddingBarScreen.fill((0, 0, 0))
             self.handScreen.fill((255, 255, 255))
 
+            #draw buttons
             for row in range(len(self.buttons)):
                 for col in range(len(self.buttons[0])):
                     self.buttons[row][col].draw(self.biddingOptScreen)
+            for bb in range(len(self.biddingBarButtons)):
+                self.biddingBarButtons[bb].draw(self.biddingBarScreen)
             
+            #put all the other surfaces on the back screen
             screen.blit(self.biddingOptScreen, (0, self.tableScreenHeight))
             screen.blit(self.biddingBarScreen, 
                 (0, self.tableScreenHeight + self.biddingOptScreenHeight))
