@@ -35,7 +35,7 @@ class PygameGame(object):
         ''' return whether a specific key is being held '''
         return self._keys.get(key, False)
 
-    def __init__(self, width=600, height=400, fps=50, title="112 Pygame Game"):
+    def __init__(self, width=400, height=600, fps=50, title="Bridge"):
         self.width = width
         self.height = height
         self.fps = fps
@@ -43,6 +43,8 @@ class PygameGame(object):
 
         self.deck = Deck()
         self.playerHand = Hand(self.deck)
+
+        self.biddingOptScreen = pygame.Surface((self.width, self.height/2))
 
         pygame.init()
 
@@ -70,7 +72,10 @@ class PygameGame(object):
                 if event.type == pygame.QUIT:
                     playing = False
 
-            screen.fill((255, 255, 255))
+            screen.fill((70, 130, 50))
+            self.biddingOptScreen.fill((50, 110, 30))
+            screen.blit(self.biddingOptScreen, (0, self.height/4))
+
             self.redrawAll(screen)
             pygame.display.flip()
 
